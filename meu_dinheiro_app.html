@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meu Dinheiro — Educação Financeira</title>
+<style>
+:root{--green:#123b30;--mint:#dff2cf;--accent:#27845f;--bg:#f4f7f3;--ink:#19352b}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--green);color:white;padding:24px 18px 18px;border-radius:0 0 24px 24px}
+header h1{margin:0 0 5px;font-size:27px}header p{margin:0;color:#d6eadc}
+nav{display:flex;gap:8px;overflow-x:auto;padding:14px;position:sticky;top:0;background:var(--bg);z-index:2}
+nav button{border:1px solid #cbd9ce;background:white;border-radius:22px;padding:10px 14px;white-space:nowrap;color:var(--ink);font-weight:bold}
+nav button.active{background:var(--green);color:white}
+main{max-width:760px;margin:auto;padding:4px 15px 35px}
+.panel{background:white;border-radius:18px;padding:19px;margin:10px 0;box-shadow:0 3px 14px #183d2a12}
+.hero{background:var(--mint);padding:22px;border-radius:18px;margin-top:8px}.hero h2{margin:5px 0 8px;font-size:25px}
+h2{font-size:21px;margin:4px 0 12px}h3{margin:0 0 8px}
+p{line-height:1.5}.muted{color:#63766b;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.tile{background:#edf5ed;border-radius:13px;padding:15px}
+button.primary{background:var(--accent);color:white;border:0;border-radius:12px;padding:12px 16px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+label{display:block;font-weight:bold;margin:12px 0 6px}input{width:100%;padding:12px;border:1px solid #cbd9ce;border-radius:10px;font-size:16px}
+.result{background:#e8f5eb;padding:15px;border-radius:13px;margin-top:15px}.big{font-size:27px;font-weight:bold;color:#174d32}
+.progress{height:10px;background:#c9ddc9;border-radius:20px;overflow:hidden}.progress span{display:block;height:100%;background:#31975d}
+.choice{display:block;padding:12px;border:1px solid #d6e0d7;border-radius:10px;margin:8px 0}
+.choice input{width:auto;margin-right:8px}
+.hidden{display:none}.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+@media(max-width:480px){.grid{grid-template-columns:1fr}.panel{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>💰 Meu Dinheiro</h1><p>Aprenda. Planeje. Conquiste.</p></header>
+<nav id="nav">
+<button class="active" data-tab="inicio">Início</button><button data-tab="aprender">Aprender</button><button data-tab="orcamento">Orçamento</button><button data-tab="metas">Metas</button><button data-tab="quiz">Quiz</button>
+</nav>
+<main>
+<section id="inicio" class="tab">
+<div class="hero"><div>🌱 Educação financeira na prática</div><h2>Cuide bem do seu dinheiro!</h2><p>Pequenas escolhas de hoje podem ajudar a realizar grandes sonhos amanhã.</p></div>
+<div class="panel"><h2>Explore o aplicativo</h2><div class="grid">
+<div class="tile">📚 <b>Aprenda</b><p class="muted">Conheça conceitos essenciais.</p></div>
+<div class="tile">🧮 <b>Simule</b><p class="muted">Organize seu orçamento.</p></div>
+<div class="tile">🎯 <b>Planeje</b><p class="muted">Crie metas de economia.</p></div>
+<div class="tile">🧠 <b>Pratique</b><p class="muted">Teste seus conhecimentos.</p></div>
+</div></div></section>
+<section id="aprender" class="tab hidden"><div class="panel"><h2>📚 Aprenda sobre finanças</h2><p class="muted">Toque em cada assunto para saber mais.</p>
+<div id="lessons"></div></div></section>
+<section id="orcamento" class="tab hidden"><div class="panel"><h2>🧮 Simulador de orçamento</h2><label>Quanto dinheiro você recebe? (R$)</label><input id="income" type="number" min="0" value="1500"><label>Quanto você gasta? (R$)</label><input id="expenses" type="number" min="0" value="850"><div class="result"><div class="muted">Saldo restante</div><div class="big" id="balance">R$ 650,00</div><p id="balanceText">Seu orçamento está positivo!</p></div></div></section>
+<section id="metas" class="tab hidden"><div class="panel"><h2>🎯 Minha meta de economia</h2><label>Quanto você quer juntar? (R$)</label><input id="goal" type="number" min="0" value="1000"><label>Quanto já guardou? (R$)</label><input id="saved" type="number" min="0" value="200"><label>Quanto pretende guardar por mês? (R$)</label><input id="monthly" type="number" min="0" value="100"><div class="result"><div class="muted">Falta economizar</div><div class="big" id="remaining">R$ 800,00</div><div class="progress"><span id="progress" style="width:20%"></span></div><p id="goalText">20% da meta alcançada. Você chegará lá em aproximadamente 8 meses.</p></div></div></section>
+<section id="quiz" class="tab hidden"><div class="panel"><div class="row"><h2>🧠 Quiz financeiro</h2><span class="muted" id="counter">Questão 1 de 5</span></div><div class="progress"><span id="quizProgress" style="width:20%"></span></div><h3 id="question" style="margin-top:18px"></h3><div id="choices"></div><div id="feedback" class="result hidden"></div><button class="primary" id="check" disabled>Confirmar resposta</button><button class="primary hidden" id="next">Próxima questão</button></div></section>
+</main>
+<script>
+const tabs=[...document.querySelectorAll('.tab')];
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));tabs.forEach(s=>s.classList.toggle('hidden',s.id!==b.dataset.tab))});
+const lessons=[
+['Educação financeira','É aprender a administrar o dinheiro, controlar gastos e tomar decisões conscientes.'],
+['Orçamento pessoal','É o planejamento de quanto dinheiro entra e quanto dinheiro sai durante determinado período.'],
+['Poupança','É o hábito de guardar uma parte do dinheiro para utilizar no futuro.'],
+['Consumo consciente','É pensar antes de comprar, avaliar necessidades e evitar desperdícios.'],
+['Juros','É um valor adicional cobrado ou recebido pelo uso de dinheiro ao longo do tempo.'],
+['Investimentos','São formas de aplicar dinheiro buscando fazê-lo crescer, considerando riscos e objetivos.']];
+document.getElementById('lessons').innerHTML=lessons.map(([a,b],i)=>`<details class="choice"><summary><b>${a}</b></summary><p>${b}</p></details>`).join('');
+const money=n=>(Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+function budget(){let x=+income.value||0,y=+expenses.value||0;balance.textContent=money(x-y);balanceText.textContent=x>y?'Seu orçamento está positivo! Considere guardar uma parte.':x===y?'Orçamento equilibrado: todo o dinheiro foi utilizado.':'Atenção: seus gastos ultrapassam o dinheiro recebido. Revise seu planejamento.'}
+[income,expenses].forEach(x=>x.addEventListener('input',budget));
+function goalCalc(){let g=Math.max(0,+goal.value||0),s=Math.max(0,+saved.value||0),m=Math.max(0,+monthly.value||0),r=Math.max(0,g-s),p=g?Math.min(100,s/g*100):0;remaining.textContent=money(r);progress.style.width=p+'%';goalText.textContent=r===0&&g>0?'🎉 Meta alcançada!':m>0&&g>0?`${Math.round(p)}% da meta alcançada. Você chegará lá em aproximadamente ${Math.ceil(r/m)} mês(es).`:'Informe uma meta e um valor mensal maior que zero.'}
+[goal,saved,monthly].forEach(x=>x.addEventListener('input',goalCalc));
+const qs=[
+['O que é educação financeira?',['Aprender a gastar todo o dinheiro','Aprender a administrar o dinheiro','Comprar tudo o que deseja'],1,'É saber organizar, economizar e utilizar o dinheiro com responsabilidade.'],
+['Você recebeu R$ 100. Qual é a atitude mais consciente?',['Gastar tudo imediatamente','Planejar os gastos e guardar uma parte','Emprestar todo o dinheiro'],1,'Planejar os gastos e reservar uma parte ajuda a construir segurança financeira.'],
+['O que é uma reserva de emergência?',['Dinheiro guardado para imprevistos','Dinheiro para compras por impulso','Uma dívida no banco'],0,'É uma quantia reservada para situações inesperadas.'],
+['Se você quer comprar algo caro, o que deve fazer?',['Comprar sem pensar','Fazer uma dívida imediatamente','Planejar e juntar dinheiro'],2,'Definir uma meta e economizar evita gastos desnecessários.'],
+['O que significa economizar?',['Guardar parte do dinheiro','Gastar mais do que recebe','Comprar sem planejamento'],0,'Economizar é reservar parte dos recursos para objetivos futuros.']];
+let qi=0,score=0,selected=null,answered=false;
+function renderQuiz(){counter.textContent=`Questão ${qi+1} de 5`;quizProgress.style.width=((qi+1)*20)+'%';question.textContent=qs[qi][0];choices.innerHTML=qs[qi][1].map((v,i)=>`<label class="choice"><input type="radio" name="answer" value="${i}">${v}</label>`).join('');feedback.classList.add('hidden');check.classList.remove('hidden');next.classList.add('hidden');check.disabled=true;answered=false;document.querySelectorAll('input[name=answer]').forEach(r=>r.onchange=()=>{selected=+r.value;check.disabled=false})}
+check.onclick=()=>{if(answered)return;answered=true;let correct=selected===qs[qi][2];if(correct)score++;feedback.classList.remove('hidden');feedback.innerHTML=`<b>${correct?'Resposta correta! ✓':'Não foi dessa vez.'}</b><p>${correct?'Muito bem!':'Resposta certa: '+qs[qi][1][qs[qi][2]]}</p><p>${qs[qi][3]}</p>`;check.classList.add('hidden');next.textContent=qi===4?'Ver resultado':'Próxima questão';next.classList.remove('hidden')};
+next.onclick=()=>{if(qi<4){qi++;selected=null;renderQuiz()}else{question.textContent=`Quiz concluído! Você acertou ${score} de 5 questões.`;choices.innerHTML=`<p>${score>=4?'Excelente trabalho!':score>=3?'Muito bem!':'Continue aprendendo!'} Continue praticando educação financeira.</p><button class="primary" onclick="qi=0;score=0;selected=null;renderQuiz()">Jogar novamente</button>`;counter.textContent='Resultado';quizProgress.style.width='100%';feedback.classList.add('hidden');next.classList.add('hidden')}};
+renderQuiz();budget();goalCalc();
+</script>
+</body></html>
